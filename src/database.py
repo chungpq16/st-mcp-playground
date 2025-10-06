@@ -14,8 +14,32 @@ from typing import Dict, List, Optional
 
 import streamlit as st
 from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.checkpoint.sqlite import SqliteSaver
-from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+
+# Try different import approaches for SQLite checkpointer (version compatibility)
+SqliteSaver = None
+AsyncSqliteSaver = None
+
+try:
+    # Try the newer separate package approach first
+    from langgraph_checkpoint_sqlite import SqliteSaver
+    from langgraph_checkpoint_sqlite.aio import AsyncSqliteSaver
+    print("✅ Using langgraph-checkpoint-sqlite package")
+except ImportError:
+    try:
+        # Try the old integrated approach
+        from langgraph.checkpoint.sqlite import SqliteSaver
+        from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+        print("✅ Using langgraph.checkpoint.sqlite")
+    except ImportError:
+        try:
+            # Try alternative import path
+            from langgraph.checkpoint.sqlite.sync import SqliteSaver
+            from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+            print("✅ Using langgraph.checkpoint.sqlite.sync")
+        except ImportError:
+            print("⚠️ SQLite checkpointer not available - using InMemory fallback only")
+            # We'll handle this gracefully by using only InMemorySaver
+
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
 
@@ -77,11 +101,16 @@ class PersistentStorageManager:
         Return a SqliteSaver-based checkpointer backed by this manager's DB.
         Falls back to InMemorySaver if SQLite setup fails.
         """
+        if SqliteSaver is None:
+            print("⚠️ SqliteSaver not available, using InMemorySaver fallback")
+            return InMemorySaver()
+        
         try:
             # Use a dedicated SQLite connection for LangGraph checkpointer ###
             conn = sqlite3.connect(self.db_path, check_same_thread=False)
             return SqliteSaver(conn)
-        except Exception:
+        except Exception as e:
+            print(f"⚠️ Failed to create SqliteSaver: {e}, using InMemorySaver fallback")
             return InMemorySaver()
 
     async def get_async_checkpointer(self):
@@ -89,9 +118,14 @@ class PersistentStorageManager:
         Create and return an AsyncSqliteSaver for async graph operations.
         Returns None on failure; caller should handle fallback.
         """
+        if AsyncSqliteSaver is None:
+            print("⚠️ AsyncSqliteSaver not available")
+            return None
+        
         try:
             return await AsyncSqliteSaver.from_conn_string(str(self.db_path))
-        except Exception:
+        except Exception as e:
+            print(f"⚠️ Failed to create AsyncSqliteSaver: {e}")
             return None
     
     def save_conversation_messages(self, thread_id: str, chat_history: List[Dict]):
