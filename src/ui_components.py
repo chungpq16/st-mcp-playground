@@ -28,20 +28,40 @@ def render_sidebar():
         st.divider()
         st.header("Configuration")
         
-        # Load environment variables and set up API key silently
+        # Load environment variables and set up API key configuration
         load_dotenv()
-        api_key = os.getenv("OPENAI_API_KEY")
         
-        # Store API key in session state for internal use
+        # Check for LLM Farm configuration first, then OpenAI fallback
+        llm_farm_url = os.getenv("LLM_FARM_URL")
+        api_key = os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY")
+        
+        # Determine provider and display status
+        if llm_farm_url and api_key:
+            provider = "LLM Farm"
+            provider_url = llm_farm_url
+            st.success(f"🚜 Using LLM Farm")
+            st.caption(f"📍 {llm_farm_url[:50]}...")
+        elif api_key:
+            provider = "OpenAI"
+            provider_url = "https://api.openai.com/v1"
+            st.success(f"🤖 Using OpenAI")
+        else:
+            provider = "None"
+            provider_url = ""
+            st.error("❌ No API key found")
+            st.caption("Please set API_KEY (LLM Farm) or OPENAI_API_KEY in .env file")
+        
+        # Store configuration in session state
         st.session_state.api_key = api_key or ""
-        st.session_state.llm_provider = "OpenAI"
+        st.session_state.llm_provider = provider
         st.session_state.selected_model = "gpt-4o-mini"
         
-        # Create a simple llm_config for other functions
+        # Create llm_config for other functions
         llm_config = {
-            "provider": "OpenAI",
+            "provider": provider,
             "api_key": api_key or "",
-            "model": "gpt-4o-mini"
+            "model": "gpt-4o-mini",
+            "base_url": provider_url
         }
         
         # Set streaming default (always enabled for GPT-4o-mini)
@@ -652,7 +672,7 @@ def handle_json_config_connection(llm_config: Dict, memory_config: Dict, mcp_ser
     """Handle connection using JSON configuration file."""
     # Check API key requirement
     if not llm_config["api_key"]:
-        st.error("❌ OpenAI API Key not found. Please add OPENAI_API_KEY to your .env file")
+        st.error("❌ API Key not found. Please add API_KEY (LLM Farm) or OPENAI_API_KEY to your .env file")
         return {"mode": "json_config", "connected": False}
     
     if not mcp_servers_config:
@@ -773,7 +793,8 @@ def create_and_configure_agent(llm_config: Dict, memory_config: Dict, mcp_tools:
             temperature=temperature,
             max_tokens=max_tokens,
             timeout=timeout,
-            system_prompt=system_prompt
+            system_prompt=system_prompt,
+            model=llm_config.get("model", "gpt-4o-mini")
         )
         
         # Get persistent storage if needed
