@@ -7,8 +7,25 @@ Supports both direct OpenAI and LLM Farm configurations.
 
 import os
 from typing import Optional
-from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
+
+# Try to import langchain_openai with fallback
+try:
+    from langchain_openai import ChatOpenAI
+    OPENAI_AVAILABLE = True
+    print("✅ LangChain OpenAI available")
+except ImportError as e:
+    print(f"⚠️ LangChain OpenAI not available: {e}")
+    print("💡 Please install: pip install langchain-openai")
+    OPENAI_AVAILABLE = False
+    
+    # Create a mock ChatOpenAI class for graceful degradation
+    class ChatOpenAI:
+        def __init__(self, *args, **kwargs):
+            raise ImportError(
+                "langchain_openai is not installed. "
+                "Please install it with: pip install langchain-openai"
+            )
 
 # Load environment variables
 load_dotenv()
@@ -39,7 +56,21 @@ def create_llm_model(
         
     Returns:
         Configured ChatOpenAI instance
+        
+    Raises:
+        ImportError: If langchain_openai is not installed
+        ValueError: If API key is not provided
     """
+    # Check if OpenAI is available
+    if not OPENAI_AVAILABLE:
+        raise ImportError(
+            "langchain_openai is not installed. "
+            "Please install the required packages:\n"
+            "pip install langchain-openai python-dotenv\n"
+            "Or install all requirements:\n"
+            "pip install -r requirements.txt"
+        )
+    
     # Get configuration from environment variables
     llm_farm_url = os.getenv('LLM_FARM_URL')
     env_api_key = os.getenv('API_KEY') or os.getenv('OPENAI_API_KEY')
@@ -101,6 +132,10 @@ def health_check() -> bool:
     Returns:
         True if healthy, False otherwise
     """
+    if not OPENAI_AVAILABLE:
+        print(f"❌ LLM Health Check: FAILED - langchain_openai not installed")
+        return False
+        
     try:
         # Create a test model instance
         test_llm = create_llm_model()
@@ -124,6 +159,15 @@ def get_llm_info() -> dict:
     Returns:
         Dictionary with LLM configuration details
     """
+    if not OPENAI_AVAILABLE:
+        return {
+            "provider": "Unavailable",
+            "base_url": "N/A",
+            "api_key_configured": False,
+            "api_key_preview": "langchain_openai not installed",
+            "error": "Please install: pip install langchain-openai"
+        }
+    
     llm_farm_url = os.getenv('LLM_FARM_URL')
     api_key = os.getenv('API_KEY') or os.getenv('OPENAI_API_KEY')
     
