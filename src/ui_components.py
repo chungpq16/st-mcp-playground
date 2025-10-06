@@ -748,14 +748,6 @@ def handle_json_config_connection(llm_config: Dict, memory_config: Dict, mcp_ser
                 
                 return {"mode": "json_config", "connected": False}
 
-
-
-
-
-
-
-
-
 def create_and_configure_agent(llm_config: Dict, memory_config: Dict, mcp_tools: List) -> bool:
     """Create and configure the agent with the given parameters."""
     try:
