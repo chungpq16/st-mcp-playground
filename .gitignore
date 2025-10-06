@@ -1,0 +1,124 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.code-workspace
+
+# Streamlit specific
+.streamlit/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Icon?
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Database files
+conversations.db
+*.db
+*.sqlite
+*.sqlite3
+memory.db
+
+# Log files
+*.log
+logs/
+streamlit.log
+
+# Temporary and cache files
+temp/
+tmp/
+*.tmp
+*.temp
+.cache/
+cache/
+
+# MCP specific files
+mcp_config_sensitive.json
+mcp_config_prod.json
+servers/
+mcp_servers/
+
+# Authentication and security
+tokens/
+*.token
+auth_cache/
+*.pem
+*.key
+*.crt
+certificates/
+
+# User uploaded files
+uploads/
+attachments/
+user_files/
+
+# Model cache
+.transformers_cache/
+.huggingface/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+docker-compose.prod.yml
+
+# Backup files
+*.bak
+*.backup
+
+# UV lock file (optional - uncomment if you don't want to version control)
+# uv.lock

@@ -1,0 +1,18 @@
+{
+  "weather": {
+    "url": "http://localhost:8000/sse",
+    "transport": "sse",
+    "timeout": 60,
+    "sse_read_timeout": 300
+  },
+  "devops-prompt-templates": {
+    "url": "http://localhost:8001/sse",
+    "transport": "sse",
+    "timeout": 60
+  },
+  "fetch": {
+    "transport": "stdio",
+    "command": "/Volumes/Data/DevOps/Learning/AI/mcp/servers/src/fetch/.venv/bin/mcp-server-fetch",
+    "args": []
+  }
+}
