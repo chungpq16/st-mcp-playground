@@ -29,13 +29,13 @@ def main():
     base_dir = Path(__file__).parent
     st.set_page_config(
         page_title="LangChain MCP Client",
-        page_icon=str(base_dir / "logo_transparent.png"),
+        # page_icon=str(base_dir / "logo_transparent.png"),
         layout="wide",
         initial_sidebar_state="expanded"
     )
 
     # Set logo
-    st.logo(str(base_dir / "side_logo.png"), size="large")
+    # st.logo(str(base_dir / "side_logo.png"), size="large")
 
     # Initialize session state with all required variables
     initialize_session_state()

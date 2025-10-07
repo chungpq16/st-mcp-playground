@@ -173,17 +173,7 @@ def initialize_session_state():
     # Initialize streaming setting
     if 'enable_streaming' not in st.session_state:
         st.session_state.enable_streaming = True
-    
-    # Initialize Ollama-specific settings
-    if 'ollama_connected' not in st.session_state:
-        st.session_state.ollama_connected = False
-    
-    if 'ollama_models' not in st.session_state:
-        st.session_state.ollama_models = []
-    
-    if 'ollama_url' not in st.session_state:
-        st.session_state.ollama_url = "http://localhost:11434"
-    
+
     # Initialize event loop with better error handling
     if 'loop' not in st.session_state:
         try:

@@ -196,44 +196,6 @@ def get_agent_config_summary(
     return config
 
 
-def validate_agent_configuration(
-    llm_provider: str,
-    api_key: str,
-    model_name: str,
-    memory_enabled: bool = False,
-    memory_type: str = None,
-    thread_id: str = None
-) -> tuple[bool, str]:
-    """
-    Validate agent configuration before creation.
-    
-    Returns:
-        Tuple of (is_valid, error_message)
-    """
-    # Import here to avoid circular imports
-    from .utils import is_valid_thread_id
-    
-    # Simplified validation for hardcoded OpenAI setup
-    if not api_key:
-        return False, "OpenAI API key is required"
-    
-    if llm_provider != "openai":
-        return False, "Only OpenAI provider is supported"
-    
-    if model_name != "gpt-4o-mini":
-        return False, "Only gpt-4o-mini model is supported"
-    
-    # Validate memory configuration
-    if memory_enabled:
-        if memory_type not in ["Short-term (Session)", "Persistent (Cross-session)"]:
-            return False, "Invalid memory type"
-        
-        if thread_id and not is_valid_thread_id(thread_id):
-            return False, "Invalid thread ID format"
-    
-    return True, ""
-
-
 def prepare_agent_invocation_config(
     memory_enabled: bool,
     thread_id: str = "default"
